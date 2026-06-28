@@ -22,13 +22,11 @@ function renderAuthPage() {
     if (!container) return;
 
     container.innerHTML = '';
-
     container.innerHTML = `
         <div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
             <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px;">
                 <div class="card-body p-4">
                     <h4 class="card-title text-center fw-bold mb-4" id="authTitle">🔐 Masuk ke Aplikasi</h4>
-                    
                     <div id="authForm">
                         <div class="mb-3">
                             <label class="form-label text-muted small">Email</label>
@@ -38,7 +36,6 @@ function renderAuthPage() {
                             <label class="form-label text-muted small">Password</label>
                             <input type="password" class="form-control" id="authPassword" placeholder="Min 6 karakter">
                         </div>
-                        
                         <div class="form-check mb-3 d-flex align-items-center">
                             <input class="form-check-input" type="checkbox" id="rememberMe" 
                                    style="width: 18px; height: 18px; margin-right: 10px; cursor: pointer;">
@@ -46,10 +43,8 @@ function renderAuthPage() {
                                 Ingat saya
                             </label>
                         </div>
-
                         <button class="btn btn-primary w-100 mb-3" id="authSubmitBtn">Masuk</button>
                     </div>
-
                     <p class="text-center small mb-0 text-muted">
                         <span id="authToggleText">Belum punya akun?</span> 
                         <a href="#" id="authToggleLink" class="text-decoration-none fw-bold">Daftar Sekarang</a>
@@ -60,14 +55,12 @@ function renderAuthPage() {
         </div>
     `;
 
-    // Load data dari localStorage
     const savedEmail = localStorage.getItem('authEmail');
     const savedPass = localStorage.getItem('authPass');
     if (savedEmail) document.getElementById('authEmail').value = savedEmail;
     if (savedPass) document.getElementById('authPassword').value = savedPass;
     if (savedEmail && savedPass) document.getElementById('rememberMe').checked = true;
 
-    // Toggle Login / Signup
     let isLogin = true;
     const title = document.getElementById('authTitle');
     const btn = document.getElementById('authSubmitBtn');
@@ -86,8 +79,6 @@ function renderAuthPage() {
         toggleText.innerText = isLogin ? 'Belum punya akun?' : 'Sudah punya akun?';
         toggleLink.innerText = isLogin ? 'Daftar Sekarang' : 'Masuk';
         errorEl.innerText = '';
-        
-        // Saat toggle, bersihkan form & localStorage
         emailInput.value = '';
         passInput.value = '';
         rememberMeCheck.checked = false;
@@ -95,22 +86,17 @@ function renderAuthPage() {
         localStorage.removeItem('authPass');
     };
 
-    // Submit
     btn.onclick = async () => {
         const email = emailInput.value.trim();
         const pass = passInput.value;
         errorEl.innerText = '';
-
         if (!email || !pass) { errorEl.innerText = 'Email dan Password wajib diisi!'; return; }
-
         try {
             if (isLogin) {
                 await auth.signInWithEmailAndPassword(email, pass);
             } else {
                 await auth.createUserWithEmailAndPassword(email, pass);
             }
-
-            // Simpan jika checkbox dicentang
             if (rememberMeCheck.checked) {
                 localStorage.setItem('authEmail', email);
                 localStorage.setItem('authPass', pass);
@@ -118,14 +104,12 @@ function renderAuthPage() {
                 localStorage.removeItem('authEmail');
                 localStorage.removeItem('authPass');
             }
-
         } catch (error) {
             errorEl.innerText = error.message.replace('Firebase: ', '');
         }
     };
 }
 
-// Logout: hanya signOut, TIDAK hapus data!
 function logoutUser() { 
     auth.signOut(); 
 }
@@ -134,4 +118,4 @@ window.auth = auth;
 window.renderAuthPage = renderAuthPage;
 window.logoutUser = logoutUser;
 
-console.log('✅ Auth Module Final (Logout Keeps Data)');
+console.log('✅ Auth Module Loaded');
