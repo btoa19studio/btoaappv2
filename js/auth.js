@@ -12,7 +12,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// 2. Render Halaman Login / Signup
+// 2. Fungsi Render Halaman Login / Signup
 function renderAuthPage() {
     const container = document.getElementById('pageContainer');
     
@@ -90,9 +90,50 @@ function renderAuthPage() {
 // 5. Logout
 function logoutUser() { auth.signOut(); }
 
-// 6. Ekspor
+// 6. Fitur Demo: Login Otomatis dengan Akun Demo (Hanya untuk Pengembangan)
+// Jika tidak ada user yang login, kita akan membuat akun demo dan login otomatis.
+function autoLoginDemo() {
+    const demoEmail = 'demo@user.com';
+    const demoPass = '123456';
+
+    // Coba login dengan akun demo
+    auth.signInWithEmailAndPassword(demoEmail, demoPass)
+        .then(() => {
+            console.log('✅ Berhasil login otomatis dengan akun demo.');
+        })
+        .catch((error) => {
+            // Jika akun demo belum ada, kita buat akun baru
+            if (error.code === 'auth/user-not-found') {
+                auth.createUserWithEmailAndPassword(demoEmail, demoPass)
+                    .then(() => {
+                        console.log('✅ Akun demo berhasil dibuat dan login otomatis.');
+                        // Simpan data user ke database (opsional)
+                        firebase.database().ref('users/' + auth.currentUser.uid).set({
+                            email: demoEmail,
+                            name: 'Demo User'
+                        });
+                    })
+                    .catch((err) => {
+                        console.error('❌ Gagal membuat akun demo:', err.message);
+                    });
+            } else {
+                console.error('❌ Gagal login otomatis:', error.message);
+            }
+        });
+}
+
+// 7. Ekspor ke Global
 window.auth = auth;
 window.renderAuthPage = renderAuthPage;
 window.logoutUser = logoutUser;
+window.autoLoginDemo = autoLoginDemo; // Untuk dipanggil dari app.js jika perlu
 
-console.log('✅ Auth Module Loaded');
+// 8. Inisialisasi: Saat auth siap, kita jalankan autoLoginDemo jika belum ada user
+auth.onAuthStateChanged((user) => {
+    if (!user) {
+        // Jika belum ada user yang login, jalankan autoLoginDemo
+        autoLoginDemo();
+    }
+});
+
+console.log('✅ Auth Module Loaded with Demo Auto-Login');
