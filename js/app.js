@@ -189,12 +189,13 @@ class App {
         const titles = { dashboard: '🏠 Dashboard', vault: '🔐 Vault', notes: '📝 Notes', todo: '✅ Todo', money: '💰 Money', travel: '🗺️ Travel' };
         document.getElementById('pageTitle').innerText = titles[page] || page;
 
-        if(page === 'dashboard') container.innerHTML = await window.dashboardModule.render();
-        else if(page === 'vault') container.innerHTML = await window.vaultModule.render();
-        else if(page === 'notes') container.innerHTML = await window.notesModule.render();
-        else if(page === 'todo') container.innerHTML = await window.todoModule.render();
-        else if(page === 'money') container.innerHTML = await window.moneyModule.render();
-        else if(page === 'travel') container.innerHTML = await window.travelModule.render();
+        // ✅ ROUTING UNTUK VAULT
+        if (page === 'dashboard') container.innerHTML = await window.dashboardModule.render();
+        else if (page === 'vault') container.innerHTML = await window.vaultModule.render();
+        else if (page === 'notes') container.innerHTML = await window.notesModule.render();
+        else if (page === 'todo') container.innerHTML = await window.todoModule.render();
+        else if (page === 'money') container.innerHTML = await window.moneyModule.render();
+        else if (page === 'travel') container.innerHTML = await window.travelModule.render();
         else container.innerHTML = '<div class="card p-4"><p>Halaman tidak ditemukan</p></div>';
     }
 }
