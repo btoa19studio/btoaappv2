@@ -18,7 +18,7 @@ try {
 }
 const auth = firebase.auth();
 
-// 2. Render Halaman Login / Signup (Dengan Checkbox Ingat Saya)
+// 2. Render Halaman Login / Signup
 function renderAuthPage() {
     const container = document.getElementById('pageContainer');
     if (!container) return;
@@ -42,10 +42,11 @@ function renderAuthPage() {
                             <input type="password" class="form-control" id="authPassword" placeholder="Min 6 karakter">
                         </div>
                         
-                        <!-- 🔥 FITUR BARU: CHECKBOX INGAT SAYA -->
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="rememberMe">
-                            <label class="form-check-label text-muted small" for="rememberMe">
+                        <!-- 🔥 CHECKBOX DIPERJELAS DENGAN STYLE LANGSUNG -->
+                        <div class="form-check mb-3 d-flex align-items-center">
+                            <input class="form-check-input" type="checkbox" id="rememberMe" 
+                                   style="width: 18px; height: 18px; margin-right: 10px; cursor: pointer;">
+                            <label class="form-check-label text-muted small" for="rememberMe" style="cursor: pointer;">
                                 Ingat saya
                             </label>
                         </div>
@@ -63,7 +64,7 @@ function renderAuthPage() {
         </div>
     `;
 
-    // --- 1. LOAD DATA DARI LOCALSTORAGE SAAT HALAMAN DIBUKA ---
+    // --- 1. LOAD DATA DARI LOCALSTORAGE ---
     const savedEmail = localStorage.getItem('authEmail');
     const savedPass = localStorage.getItem('authPass');
     if (savedEmail) document.getElementById('authEmail').value = savedEmail;
@@ -90,7 +91,6 @@ function renderAuthPage() {
         toggleLink.innerText = isLogin ? 'Daftar Sekarang' : 'Masuk';
         errorEl.innerText = '';
         
-        // Saat toggle mode, reset form & hapus data tersimpan
         emailInput.value = '';
         passInput.value = '';
         rememberMeCheck.checked = false;
@@ -98,7 +98,7 @@ function renderAuthPage() {
         localStorage.removeItem('authPass');
     };
 
-    // --- 3. LOGIKA SUBMIT (LOGIN / DAFTAR) ---
+    // --- 3. LOGIKA SUBMIT ---
     btn.onclick = async () => {
         const email = emailInput.value.trim();
         const pass = passInput.value;
@@ -128,7 +128,7 @@ function renderAuthPage() {
     };
 }
 
-// 3. Logout (Hapus data localStorage saat user keluar)
+// 3. Logout
 function logoutUser() { 
     localStorage.removeItem('authEmail');
     localStorage.removeItem('authPass');
@@ -140,4 +140,4 @@ window.auth = auth;
 window.renderAuthPage = renderAuthPage;
 window.logoutUser = logoutUser;
 
-console.log('✅ Auth Module (With Remember Me) Loaded');
+console.log('✅ Auth Module (With Visible Checkbox) Loaded');
