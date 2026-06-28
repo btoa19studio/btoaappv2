@@ -9,21 +9,27 @@ class App {
     async init() {
         auth.onAuthStateChanged((user) => {
             if (user) {
+                // LOGIN BERHASIL
                 this.user = user;
                 document.getElementById('userAvatar').innerText = user.email.charAt(0).toUpperCase();
-                
-                // 💥 MUNCULKAN HEADER DAN FAB SAAT LOGIN BERHASIL
                 document.getElementById('appHeader').classList.remove('d-none');
                 document.getElementById('fabBtn').classList.remove('d-none');
-
                 this.loadDashboard();
+                document.getElementById('loadingScreen').classList.add('hidden');
             } else {
-                // 💥 PASTIKAN HEADER DAN FAB HILANG SAAT LOGOUT
+                // LOGOUT ATAU BELUM LOGIN
+                this.user = null;
                 document.getElementById('appHeader').classList.add('d-none');
                 document.getElementById('fabBtn').classList.add('d-none');
-
-                renderAuthPage();
+                
+                // 💥 PASTIKAN RENDER HALAMAN LOGIN
+                renderAuthPage(); 
                 document.getElementById('loadingScreen').classList.add('hidden');
+                
+                // Reset halaman aktif di sidebar
+                document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(el => {
+                    el.classList.remove('active');
+                });
             }
         });
     }
@@ -37,7 +43,6 @@ class App {
             this.setupLogout();
             
             this.loadPage('dashboard');
-            document.getElementById('loadingScreen').classList.add('hidden');
         } catch(e) { 
             console.error("Error App Init:", e); 
         }
@@ -132,6 +137,9 @@ class App {
     }
     
     async loadPage(page) {
+        // Hanya izinkan load page jika user sudah login
+        if (!this.user) return;
+
         this.currentPage = page;
         const container = document.getElementById('pageContainer');
         
