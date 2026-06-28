@@ -8,51 +8,72 @@ class App {
     }
 
     async init() {
+        // Listener Status Login (SATU-SATUNYA TEMPAT MENGATUR UI)
         auth.onAuthStateChanged((user) => {
             const header = document.getElementById('appHeader');
             const fab = document.getElementById('fabBtn');
 
             if (user) {
-                // LOGIN BERHASIL
+                // --- LOGIN BERHASIL ---
                 this.user = user;
                 
+                // Tampilkan Header & FAB
                 if(header) header.classList.remove('d-none');
                 if(fab) fab.classList.remove('d-none');
-                document.getElementById('userAvatar').innerText = user.email.charAt(0).toUpperCase();
+                
+                // 💥 UPDATE DATA PROFIL DI NAVBAR DAN DROPDOWN
+                const email = user.email;
+                const name = email.split('@')[0]; // Ambil nama dari email
+                const initial = email.charAt(0).toUpperCase();
 
+                // Update Avatar kecil di navbar
+                document.getElementById('userAvatar').innerText = initial;
+                // Update Avatar besar di dropdown
+                document.getElementById('dropdownAvatar').innerText = initial;
+                // Update nama di dropdown
+                document.getElementById('dropdownName').innerText = name;
+                // Update email di dropdown
+                document.getElementById('dropdownEmail').innerText = email;
+
+                // Muat Dashboard
                 this.loadDashboard();
                 this.isAppReady = true;
+                
+                // Hilangkan loading
                 document.getElementById('loadingScreen').classList.add('hidden');
             } else {
-                // LOGOUT / BELUM LOGIN
+                // --- LOGOUT / BELUM LOGIN ---
                 this.user = null;
                 this.isAppReady = false;
                 
+                // Sembunyikan Header & FAB
                 if(header) header.classList.add('d-none');
                 if(fab) fab.classList.add('d-none');
 
-                // Reset Sidebar
+                // Reset Sidebar Active State
                 document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(el => {
                     el.classList.remove('active');
                 });
                 document.getElementById('pageTitle').innerText = '🔐 Silakan Login';
 
-                // 💥 PASTIKAN HANYA MENAMPILKAN LOGIN, TIDAK HAPUS DATA!
+                // 💥 RESET KONTEN DASHBOARD DAN RENDER HALAMAN LOGIN
                 const container = document.getElementById('pageContainer');
                 container.innerHTML = ''; 
-                renderAuthPage(); // Data localStorage akan terbaca otomatis
+                renderAuthPage(); 
                 
                 document.getElementById('loadingScreen').classList.add('hidden');
 
-                // Demo account (hanya 1x)
+                // 💡 FITUR DEMO (HANYA SAAT PERTAMA KALI BUKA APLIKASI)
                 if (!localStorage.getItem('demoAccountCreated')) {
                     console.log('🛠️ Membuat akun demo pertama kali...');
                     const demoEmail = 'demo@user.com';
                     const demoPass = '123456';
+
                     auth.createUserWithEmailAndPassword(demoEmail, demoPass)
                         .then(() => {
                             console.log('✅ Akun demo berhasil dibuat. Login otomatis...');
                             localStorage.setItem('demoAccountCreated', 'true');
+                            // Kode akan otomatis masuk ke auth.onAuthStateChanged bagian 'user' di atas.
                         })
                         .catch((err) => {
                             if (err.code !== 'auth/email-already-in-use') {
@@ -60,6 +81,26 @@ class App {
                             }
                         });
                 }
+            }
+        });
+
+        // 🔥 EVENT LISTENER UNTUK DROPDOWN PROFIL
+        // Edit Profil (placeholder)
+        document.getElementById('editProfileBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            const newName = prompt('Masukkan nama baru Anda:', this.user?.email?.split('@')[0] || 'Pengguna');
+            if (newName && newName.trim() !== '') {
+                // Untuk demo, kita hanya update di UI, tidak ke Firebase Database
+                document.getElementById('dropdownName').innerText = newName.trim();
+                Utils.showToast('✅ Nama profil diperbarui (lokal)', 'success');
+            }
+        });
+
+        // Logout dari dropdown
+        document.getElementById('dropdownLogoutBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            if(confirm('Apakah Anda yakin ingin keluar?')) {
+                logoutUser(); // Fungsi dari auth.js
             }
         });
     }
@@ -70,7 +111,8 @@ class App {
             this.setupThemeToggle();
             this.setupCustomizer();
             this.setupFAB();
-            this.setupLogout();
+            this.setupLogout(); // Tetap pertahankan tombol logout di sidebar jika diperlukan
+            
             this.loadPage('dashboard');
         } catch(e) { 
             console.error("Error App Init:", e); 
@@ -78,10 +120,11 @@ class App {
     }
 
     setupLogout() {
+        // Tombol logout di sidebar
         document.getElementById('logoutBtn').onclick = (e) => {
             e.preventDefault();
             if(confirm('Apakah Anda yakin ingin keluar?')) {
-                logoutUser(); // Fungsi dari auth.js (hanya signOut)
+                logoutUser();
             }
         };
     }
@@ -166,6 +209,7 @@ class App {
     }
     
     async loadPage(page) {
+        // Hanya izinkan load page jika user sudah login
         if (!this.user) return;
 
         this.currentPage = page;
@@ -188,6 +232,7 @@ class App {
     }
 }
 
+// START APLIKASI
 const app = new App();
 window.app = app;
 
