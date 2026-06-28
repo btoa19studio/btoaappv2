@@ -1,4 +1,5 @@
 'use strict';
+
 class DashboardModule {
     async render() {
         // Layout dashboard menggunakan Grid Bootstrap 5
@@ -91,5 +92,8 @@ class DashboardModule {
     }
 }
 
+// 2. EXPORT KE GLOBAL SCOPE
 const dashboardModule = new DashboardModule();
 window.dashboardModule = dashboardModule;
+
+console.log('✅ Dashboard Module Loaded');
