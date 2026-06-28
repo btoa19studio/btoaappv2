@@ -69,8 +69,8 @@
 
     <!-- MAIN CONTENT -->
     <div class="main-content bg-white" id="mainContent">
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-3 py-2">
+        <!-- Navbar (Diberi ID appHeader) -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-3 py-2" id="appHeader">
             <div class="d-flex align-items-center gap-3 w-100">
                 <button class="btn btn-icon text-dark d-md-none" id="menuToggle"><i class='bx bx-menu fs-3'></i></button>
                 <button class="btn btn-icon text-dark d-none d-md-block me-2" id="sidebarToggle"><i class='bx bx-menu fs-3'></i></button>
@@ -103,6 +103,7 @@
         </div>
     </div>
 
+    <!-- FAB BUTTON -->
     <button class="btn btn-primary rounded-circle shadow position-fixed bottom-0 end-0 m-4" id="fabBtn" style="width: 56px; height: 56px; font-size: 24px;">
         <i class='bx bx-plus'></i>
     </button>
@@ -115,7 +116,7 @@
     <!-- BOOTSTRAP 5 JS BUNDLE -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- APP SCRIPTS (URUTAN PENTING) -->
+    <!-- APP SCRIPTS -->
     <script src="js/modules.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/dashboard.js"></script>
