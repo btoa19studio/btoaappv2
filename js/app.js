@@ -3,18 +3,34 @@
 class App {
     constructor() { 
         this.currentPage = 'dashboard'; 
+        this.user = null;
     }
 
     async init() {
+        // 1. Cek status Login terlebih dahulu
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                this.user = user;
+                document.getElementById('userAvatar').innerText = user.email.charAt(0).toUpperCase();
+                this.loadDashboard();
+            } else {
+                // Jika belum login, tampilkan halaman login
+                renderAuthPage();
+                document.getElementById('loadingScreen').classList.add('hidden');
+            }
+        });
+    }
+
+    loadDashboard() {
         try {
-            // Setup semua komponen UI
             this.setupSidebar();
             this.setupThemeToggle();
             this.setupCustomizer();
             this.setupFAB();
+            this.setupLogout();
             
             // Muat halaman pertama
-            await this.loadPage('dashboard');
+            this.loadPage('dashboard');
             
             // Hilangkan loading screen
             document.getElementById('loadingScreen').classList.add('hidden');
@@ -23,13 +39,21 @@ class App {
         }
     }
 
+    setupLogout() {
+        document.getElementById('logoutBtn').onclick = (e) => {
+            e.preventDefault();
+            if(confirm('Apakah Anda yakin ingin keluar?')) {
+                logoutUser();
+            }
+        };
+    }
+
     setupSidebar() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
         const menuToggle = document.getElementById('menuToggle');
         const closeSidebar = document.getElementById('closeSidebar');
 
-        // Fungsi helper untuk toggle sidebar mobile
         const toggleMobileSidebar = (forceClose = false) => {
             if (forceClose) {
                 sidebar.classList.remove('open');
@@ -37,7 +61,6 @@ class App {
                 return;
             }
             sidebar.classList.toggle('open');
-            // Sync overlay
             if (sidebar.classList.contains('open')) {
                 overlay.classList.add('active');
             } else {
@@ -45,29 +68,20 @@ class App {
             }
         };
 
-        // 1. Event tombol hamburger (Mobile)
         if(menuToggle) menuToggle.onclick = () => toggleMobileSidebar();
-
-        // 2. Event tombol close (X) di sidebar (Mobile)
         if(closeSidebar) closeSidebar.onclick = () => toggleMobileSidebar(true);
-
-        // 3. Event klik area kosong (Overlay) untuk menutup sidebar
         if(overlay) overlay.onclick = () => toggleMobileSidebar(true);
 
-        // 4. Toggle Collapse Sidebar (Desktop)
         document.getElementById('sidebarToggle').onclick = () => {
             sidebar.classList.toggle('d-none');
             document.getElementById('mainContent').classList.toggle('ms-0');
         };
 
-        // 5. Navigasi Link (Otomatis tutup sidebar setelah klik di mobile)
         document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(el => {
             el.onclick = (e) => { 
                 e.preventDefault(); 
                 const page = el.dataset.page;
                 this.loadPage(page);
-                
-                // Jika di mobile, tutup sidebar setelah pindah halaman
                 if (window.innerWidth < 768) {
                     toggleMobileSidebar(true);
                 }
@@ -117,16 +131,13 @@ class App {
         this.currentPage = page;
         const container = document.getElementById('pageContainer');
         
-        // Update active class di sidebar
         document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(el => {
             el.classList.toggle('active', el.dataset.page === page);
         });
         
-        // Update Title
         const titles = { dashboard: '🏠 Dashboard', vault: '🔐 Vault', notes: '📝 Notes', todo: '✅ Todo', money: '💰 Money', travel: '🗺️ Travel' };
         document.getElementById('pageTitle').innerText = titles[page] || page;
 
-        // Render Konten berdasarkan halaman
         if(page === 'dashboard') container.innerHTML = await window.dashboardModule.render();
         else if(page === 'vault') container.innerHTML = await window.vaultModule.render();
         else if(page === 'notes') container.innerHTML = await window.notesModule.render();
@@ -139,9 +150,8 @@ class App {
 
 // START APLIKASI
 const app = new App();
-window.app = app; // Ekspor ke window agar bisa diakses jika diperlukan
+window.app = app;
 
-// Tunggu DOM siap, lalu jalankan init
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => app.init());
 } else {
