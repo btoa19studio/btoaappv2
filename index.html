@@ -69,15 +69,37 @@
 
     <!-- MAIN CONTENT -->
     <div class="main-content bg-white" id="mainContent">
-        <!-- Navbar (DEFAULT HIDDEN - DITAMBAHKAN d-none) -->
+        <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-3 py-2 d-none" id="appHeader">
             <div class="d-flex align-items-center gap-3 w-100">
                 <button class="btn btn-icon text-dark d-md-none" id="menuToggle"><i class='bx bx-menu fs-3'></i></button>
                 <button class="btn btn-icon text-dark d-none d-md-block me-2" id="sidebarToggle"><i class='bx bx-menu fs-3'></i></button>
                 <h5 class="m-0 fw-bold text-dark" id="pageTitle">🏠 Dashboard</h5>
-                <div class="ms-auto d-flex align-items-center gap-2">
+                <div class="ms-auto d-flex align-items-center gap-2 position-relative">
                     <button class="btn btn-icon text-dark" id="themeToggle"><i class='bx bx-moon fs-4'></i></button>
-                    <div class="avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; font-weight: 600;" id="userAvatar">A</div>
+                    
+                    <!-- 🔥 AVATAR SEBAGAI TOMBOL DROPDOWN -->
+                    <div class="dropdown">
+                        <button class="btn btn-link p-0 border-0 dropdown-toggle" type="button" id="profileDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; font-weight: 600;" id="userAvatar">A</div>
+                        </button>
+                        
+                        <!-- Menu Dropdown Profil -->
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 p-0" style="min-width: 220px; overflow: hidden;" aria-labelledby="profileDropdownBtn">
+                            <li class="p-3 bg-light border-bottom" style="cursor: default;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; font-weight: 600; font-size: 18px;" id="dropdownAvatar">A</div>
+                                    <div>
+                                        <div class="fw-bold text-dark" id="dropdownName">Pengguna</div>
+                                        <div class="text-muted small text-truncate" id="dropdownEmail" style="max-width: 130px;">email@example.com</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider m-0"></li>
+                            <li><a class="dropdown-item py-2 px-3" href="#" id="editProfileBtn"><i class='bx bx-edit-alt me-2'></i> Edit Profil</a></li>
+                            <li><a class="dropdown-item py-2 px-3 text-danger" href="#" id="dropdownLogoutBtn"><i class='bx bx-log-out me-2'></i> Logout</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -101,7 +123,6 @@
         </div>
     </div>
 
-    <!-- FAB BUTTON (DEFAULT HIDDEN - DITAMBAHKAN d-none) -->
     <button class="btn btn-primary rounded-circle shadow position-fixed bottom-0 end-0 m-4 d-none" id="fabBtn" style="width: 56px; height: 56px; font-size: 24px;">
         <i class='bx bx-plus'></i>
     </button>
