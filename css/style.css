@@ -3,14 +3,14 @@
 body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
 
 /* Loading Screen */
-.loading-screen { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fff; transition: opacity 0.5s; }
-.loading-screen.hidden { opacity: 0; pointer-events: none; }
+.loading-screen { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fff; transition: opacity 0.3s; }
+.loading-screen.hidden { opacity: 0; pointer-events: none; display: none !important; }
 
 /* Sidebar Overlay (Fitur Klik Area Kosong untuk Menutup) */
 .sidebar-overlay {
     position: fixed;
     inset: 0;
-    z-index: 1039; /* Di bawah sidebar, di atas konten */
+    z-index: 1039; /* Di bawah sidebar (1040), di atas konten */
     background: rgba(0, 0, 0, 0.5);
     opacity: 0;
     visibility: hidden;
@@ -40,7 +40,7 @@ body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
 .sidebar .nav-link i { font-size: 1.2rem; }
 
 /* Button Icon */
-.btn-icon { width: 40px; height: 40px; border: none; background: transparent; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
+.btn-icon { width: 40px; height: 40px; border: none; background: transparent; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.2s; cursor: pointer;}
 .btn-icon:hover { background: rgba(0,0,0,0.05); }
 
 /* Dashboard Stats Cards */
