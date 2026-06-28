@@ -15,6 +15,11 @@ const auth = firebase.auth();
 // 2. Fungsi Render Halaman Login / Signup
 function renderAuthPage() {
     const container = document.getElementById('pageContainer');
+    
+    // 💡 HILANGKAN HEADER DAN FAB DI HALAMAN LOGIN
+    document.getElementById('appHeader').classList.add('d-none');
+    document.getElementById('fabBtn').classList.add('d-none');
+
     container.innerHTML = `
         <div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
             <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px;">
