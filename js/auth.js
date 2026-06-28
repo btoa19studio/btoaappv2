@@ -17,17 +17,22 @@ try {
 } catch {
     firebaseApp = firebase.initializeApp(firebaseConfig);
 }
-
 const auth = firebase.auth();
 
-// 2. Variabel Flag: Membatasi Auto-Login hanya sekali saat aplikasi pertama dibuka
+// 2. Flag: Hanya izinkan auto-login 1x (saat pertama kali buka aplikasi)
 let autoLoginAttempted = false;
 
-// 3. Fungsi Render Halaman Login / Signup
+// 3. Render Halaman Login / Signup (Dengan Pembersihan Container)
 function renderAuthPage() {
     const container = document.getElementById('pageContainer');
-    if (!container) return;
-    
+    if (!container) {
+        console.error('❌ pageContainer tidak ditemukan!');
+        return;
+    }
+
+    // 💥 KUNCI PERBAIKAN: Kosongkan container sebelum mengisi ulang
+    container.innerHTML = '';
+
     container.innerHTML = `
         <div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
             <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px;">
@@ -51,20 +56,18 @@ function renderAuthPage() {
                         <a href="#" id="authToggleLink" class="text-decoration-none fw-bold">Daftar Sekarang</a>
                     </p>
                     <div id="authError" class="text-danger small text-center mt-2"></div>
-                    <div id="authSystemError" class="text-danger small text-center mt-2 fw-bold"></div>
                 </div>
             </div>
         </div>
     `;
 
-    // 4. Logika Toggle Login / Signup
+    // Logika Toggle Login / Signup
     let isLogin = true;
     const title = document.getElementById('authTitle');
     const btn = document.getElementById('authSubmitBtn');
     const toggleText = document.getElementById('authToggleText');
     const toggleLink = document.getElementById('authToggleLink');
     const errorEl = document.getElementById('authError');
-    const systemErrorEl = document.getElementById('authSystemError');
 
     toggleLink.onclick = (e) => {
         e.preventDefault();
@@ -74,15 +77,13 @@ function renderAuthPage() {
         toggleText.innerText = isLogin ? 'Belum punya akun?' : 'Sudah punya akun?';
         toggleLink.innerText = isLogin ? 'Daftar Sekarang' : 'Masuk';
         errorEl.innerText = '';
-        systemErrorEl.innerText = '';
     };
 
-    // 5. Logika Submit
+    // Logika Submit
     btn.onclick = async () => {
         const email = document.getElementById('authEmail').value;
         const pass = document.getElementById('authPassword').value;
         errorEl.innerText = '';
-        systemErrorEl.innerText = '';
 
         if(!email || !pass) { errorEl.innerText = 'Email dan Password wajib diisi!'; return; }
 
@@ -97,25 +98,22 @@ function renderAuthPage() {
                 });
             }
         } catch (error) {
-            const msg = error.message;
-            if (msg.includes('CONFIGURATION_NOT_FOUND')) {
-                systemErrorEl.innerText = '⚠️ Error Server: Login Email/Password belum diaktifkan di Firebase Console. Silakan buka Firebase > Authentication > Sign-in method dan aktifkan Email/Password.';
-            } else {
-                errorEl.innerText = msg.replace('Firebase: ', '');
-            }
+            errorEl.innerText = error.message.replace('Firebase: ', '');
         }
     };
 }
 
-// 6. Logout (Dipanggil oleh tombol di sidebar)
+// 4. Logout
 function logoutUser() { 
     auth.signOut(); 
 }
 
-// 7. Fitur Demo: Login Otomatis (Hanya untuk pengembangan)
+// 5. Fungsi Auto-Login Demo
 function autoLoginDemo() {
-    // Hanya jalankan jika belum pernah dijalankan sebelumnya
-    if (autoLoginAttempted) return;
+    if (autoLoginAttempted) {
+        console.log('⏸️ Auto-login dilewati (sudah pernah dicoba sebelumnya).');
+        return;
+    }
     autoLoginAttempted = true;
 
     const demoEmail = 'demo@user.com';
@@ -137,37 +135,19 @@ function autoLoginDemo() {
         });
 }
 
-// 8. Ekspor ke Global
+// 6. Ekspor ke Global
 window.auth = auth;
 window.renderAuthPage = renderAuthPage;
 window.logoutUser = logoutUser;
 window.autoLoginDemo = autoLoginDemo;
 
-// 9. Listener Status Auth (FIXED: Auto-login hanya saat pertama kali buka aplikasi)
+// 7. Listener untuk Auto-Login
+// (Kita biarkan app.js yang menangani UI, auth.js hanya menangani logika demo)
 auth.onAuthStateChanged((user) => {
-    const header = document.getElementById('appHeader');
-    const fab = document.getElementById('fabBtn');
-
-    if (user) {
-        // LOGIN BERHASIL
-        document.getElementById('userAvatar').innerText = user.email.charAt(0).toUpperCase();
-        if(header) header.classList.remove('d-none');
-        if(fab) fab.classList.remove('d-none');
-        console.log('✅ User login:', user.email);
-        // Load dashboard dilakukan oleh app.js
-    } else {
-        // LOGOUT ATAU BELUM LOGIN
-        if(header) header.classList.add('d-none');
-        if(fab) fab.classList.add('d-none');
-        renderAuthPage();
-        document.getElementById('loadingScreen').classList.add('hidden');
-        
-        // 💡 KUNCI PERBAIKAN: Hanya jalankan auto-login jika aplikasi baru dibuka (dan belum pernah login)
-        // Jika user melakukan Logout manual, autoLoginAttempted sudah true, jadi tidak akan jalan lagi!
-        if (!autoLoginAttempted) {
-            autoLoginDemo();
-        }
+    if (!user && !autoLoginAttempted) {
+        // Jika belum ada user dan auto-login belum dicoba, jalankan demo
+        autoLoginDemo();
     }
 });
 
-console.log('✅ Auth Module Loaded (Fixed Logout Loop)');
+console.log('✅ Auth Module Loaded (Fixed)');
