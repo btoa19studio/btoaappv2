@@ -12,21 +12,53 @@ class App {
         } catch(e) { console.error(e); }
     }
     setupSidebar() {
-        // Toggle untuk Mobile
-        document.getElementById('menuToggle').onclick = () => {
-            document.getElementById('sidebar').classList.toggle('open');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebar = document.getElementById('closeSidebar');
+
+        // Fungsi helper untuk toggle sidebar mobile
+        const toggleMobileSidebar = (forceClose = false) => {
+            if (forceClose) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+                return;
+            }
+            // Toggle class
+            sidebar.classList.toggle('open');
+            // Sync overlay
+            if (sidebar.classList.contains('open')) {
+                overlay.classList.add('active');
+            } else {
+                overlay.classList.remove('active');
+            }
         };
-        document.getElementById('closeSidebar').onclick = () => {
-            document.getElementById('sidebar').classList.remove('open');
-        };
-        // Toggle untuk Desktop (Collapse)
+
+        // Event listener untuk tombol menu mobile
+        if(menuToggle) menuToggle.onclick = () => toggleMobileSidebar();
+
+        // Event listener untuk tombol close (X) di sidebar mobile
+        if(closeSidebar) closeSidebar.onclick = () => toggleMobileSidebar(true);
+
+        // Event listener untuk overlay (klik area kosong)
+        if(overlay) overlay.onclick = () => toggleMobileSidebar(true);
+
+        // Toggle untuk Desktop (Collapse) - Hanya di Desktop
         document.getElementById('sidebarToggle').onclick = () => {
-            document.getElementById('sidebar').classList.toggle('d-none');
+            sidebar.classList.toggle('d-none');
             document.getElementById('mainContent').classList.toggle('ms-0');
         };
-        // Navigasi Link
+
+        // Navigasi Link (Jika menu diklik, sidebar mobile otomatis menutup)
         document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(el => {
-            el.onclick = (e) => { e.preventDefault(); this.loadPage(el.dataset.page); };
+            el.onclick = (e) => { 
+                e.preventDefault(); 
+                this.loadPage(el.dataset.page);
+                // Tutup sidebar setelah klik link (di mobile)
+                if (window.innerWidth < 768) {
+                    toggleMobileSidebar(true);
+                }
+            };
         });
     }
     setupThemeToggle() {
