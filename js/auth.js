@@ -1,6 +1,6 @@
 'use strict';
 
-// 1. Inisialisasi Auth Firebase (Menggunakan config dari project Anda)
+// 1. Inisialisasi Auth Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyA4BVxcbPKWzyTZaQp5xyN9bluEcSNINnE",
     authDomain: "allinoneapp-b5578.firebaseapp.com",
@@ -12,13 +12,15 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// 2. Fungsi Render Halaman Login / Signup
+// 2. Render Halaman Login / Signup
 function renderAuthPage() {
     const container = document.getElementById('pageContainer');
     
-    // 💡 HILANGKAN HEADER DAN FAB DI HALAMAN LOGIN
-    document.getElementById('appHeader').classList.add('d-none');
-    document.getElementById('fabBtn').classList.add('d-none');
+    // 💥 METODE KUAT: Hilangkan Header dan FAB menggunakan style.display langsung
+    const header = document.getElementById('appHeader');
+    const fab = document.getElementById('fabBtn');
+    if(header) header.style.display = 'none';
+    if(fab) fab.style.display = 'none';
 
     container.innerHTML = `
         <div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
@@ -66,7 +68,7 @@ function renderAuthPage() {
         errorEl.innerText = '';
     };
 
-    // 4. Logika Submit (Login / Signup)
+    // 4. Logika Submit
     btn.onclick = async () => {
         const email = document.getElementById('authEmail').value;
         const pass = document.getElementById('authPassword').value;
@@ -79,7 +81,6 @@ function renderAuthPage() {
                 await auth.signInWithEmailAndPassword(email, pass);
             } else {
                 await auth.createUserWithEmailAndPassword(email, pass);
-                // Simpan profil user ke database saat pertama daftar (Opsional)
                 await firebase.database().ref('users/' + auth.currentUser.uid).set({
                     email: email,
                     name: email.split('@')[0]
@@ -91,12 +92,10 @@ function renderAuthPage() {
     };
 }
 
-// 5. Fungsi Logout
-function logoutUser() {
-    auth.signOut();
-}
+// 5. Logout
+function logoutUser() { auth.signOut(); }
 
-// 6. Ekspor ke Global Scope
+// 6. Ekspor
 window.auth = auth;
 window.renderAuthPage = renderAuthPage;
 window.logoutUser = logoutUser;
