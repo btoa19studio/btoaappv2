@@ -23,6 +23,10 @@ class App {
 
     loadDashboard() {
         try {
+            // 💡 MUNCULKAN KEMBALI HEADER DAN FAB SAAT LOGIN BERHASIL
+            document.getElementById('appHeader').classList.remove('d-none');
+            document.getElementById('fabBtn').classList.remove('d-none');
+
             this.setupSidebar();
             this.setupThemeToggle();
             this.setupCustomizer();
