@@ -1,121 +1,137 @@
 'use strict';
 
-const firebaseConfig = {
-    apiKey: "AIzaSyA4BVxcbPKWzyTZaQp5xyN9bluEcSNINnE",
-    authDomain: "allinoneapp-b5578.firebaseapp.com",
-    projectId: "allinoneapp-b5578",
-    storageBucket: "allinoneapp-b5578.firebasestorage.app",
-    messagingSenderId: "37135502818",
-    appId: "1:37135502818:web:35fff036f12efe1b457dbb"
-};
+const vaultModule = {
+    data: [],
+    folders: [],
+    filteredData: [],
+    expandedFolders: [],
+    selectedItem: null,
+    editorInstance: null,
 
-let firebaseApp;
-try {
-    firebaseApp = firebase.app();
-} catch {
-    firebaseApp = firebase.initializeApp(firebaseConfig);
-}
-const auth = firebase.auth();
+    async init() {
+        this.editorInstance = null;
+        await this.loadData();
+    },
 
-function renderAuthPage() {
-    const container = document.getElementById('pageContainer');
-    if (!container) return;
+    async loadData() {
+        const uid = auth.currentUser?.uid;
+        if (!uid) return;
+        try {
+            const snapshot = await firebase.database().ref('users/' + uid + '/passwords').once('value');
+            const raw = snapshot.val();
+            this.data = raw ? Object.keys(raw).map(key => ({ id: key, ...raw[key] })) : [];
+            const folderSet = new Set();
+            this.data.forEach(item => {
+                if (item.folder) folderSet.add(item.folder);
+            });
+            this.folders = Array.from(folderSet);
+            this.filteredData = [...this.data];
+            this.expandedFolders = [...this.folders, '_uncategorized'];
+        } catch (e) {
+            console.error('Gagal load vault:', e);
+            this.data = [];
+            this.filteredData = [];
+        }
+    },
 
-    container.innerHTML = '';
-    container.innerHTML = `
-        <div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
-            <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px;">
-                <div class="card-body p-4">
-                    <h4 class="card-title text-center fw-bold mb-4" id="authTitle">🔐 Masuk ke Aplikasi</h4>
-                    <div id="authForm">
-                        <div class="mb-3">
-                            <label class="form-label text-muted small">Email</label>
-                            <input type="email" class="form-control" id="authEmail" placeholder="contoh@email.com">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label text-muted small">Password</label>
-                            <input type="password" class="form-control" id="authPassword" placeholder="Min 6 karakter">
-                        </div>
-                        <div class="form-check mb-3 d-flex align-items-center">
-                            <input class="form-check-input" type="checkbox" id="rememberMe" 
-                                   style="width: 18px; height: 18px; margin-right: 10px; cursor: pointer;">
-                            <label class="form-check-label text-muted small" for="rememberMe" style="cursor: pointer;">
-                                Ingat saya
-                            </label>
-                        </div>
-                        <button class="btn btn-primary w-100 mb-3" id="authSubmitBtn">Masuk</button>
+    async render() {
+        await this.init();
+        const total = this.data.length;
+        return `
+            <div class="container-fluid p-0">
+                <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 gap-2">
+                    <div>
+                        <h4 class="fw-bold text-dark m-0">🔐 Password Vault</h4>
+                        <span class="text-muted small">Total ' + total + ' akun tersimpan</span>
                     </div>
-                    <p class="text-center small mb-0 text-muted">
-                        <span id="authToggleText">Belum punya akun?</span> 
-                        <a href="#" id="authToggleLink" class="text-decoration-none fw-bold">Daftar Sekarang</a>
-                    </p>
-                    <div id="authError" class="text-danger small text-center mt-2"></div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <div class="input-group" style="max-width: 200px;">
+                            <span class="input-group-text bg-white border-end-0"><i class="bx bx-search"></i></span>
+                            <input type="text" class="form-control border-start-0" id="vaultSearch" placeholder="Cari...">
+                        </div>
+                        <select class="form-select" style="max-width: 120px;" id="vaultFilter">
+                            <option value="">Semua Folder</option>
+                        </select>
+                        <button class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;" onclick="vaultModule.showAddForm()">
+                            <i class="bx bx-plus fs-4"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="vaultContainer">
+                    <div class="text-center text-muted py-5"><i class="bx bx-lock-open fs-1"></i><p>Belum ada akun tersimpan. Klik + untuk menambahkan.</p></div>
                 </div>
             </div>
-        </div>
-    `;
+        `;
+    },
 
-    const savedEmail = localStorage.getItem('authEmail');
-    const savedPass = localStorage.getItem('authPass');
-    if (savedEmail) document.getElementById('authEmail').value = savedEmail;
-    if (savedPass) document.getElementById('authPassword').value = savedPass;
-    if (savedEmail && savedPass) document.getElementById('rememberMe').checked = true;
-
-    let isLogin = true;
-    const title = document.getElementById('authTitle');
-    const btn = document.getElementById('authSubmitBtn');
-    const toggleText = document.getElementById('authToggleText');
-    const toggleLink = document.getElementById('authToggleLink');
-    const errorEl = document.getElementById('authError');
-    const emailInput = document.getElementById('authEmail');
-    const passInput = document.getElementById('authPassword');
-    const rememberMeCheck = document.getElementById('rememberMe');
-
-    toggleLink.onclick = (e) => {
-        e.preventDefault();
-        isLogin = !isLogin;
-        title.innerText = isLogin ? '🔐 Masuk ke Aplikasi' : '📝 Daftar Akun Baru';
-        btn.innerText = isLogin ? 'Masuk' : 'Daftar';
-        toggleText.innerText = isLogin ? 'Belum punya akun?' : 'Sudah punya akun?';
-        toggleLink.innerText = isLogin ? 'Daftar Sekarang' : 'Masuk';
-        errorEl.innerText = '';
-        emailInput.value = '';
-        passInput.value = '';
-        rememberMeCheck.checked = false;
-        localStorage.removeItem('authEmail');
-        localStorage.removeItem('authPass');
-    };
-
-    btn.onclick = async () => {
-        const email = emailInput.value.trim();
-        const pass = passInput.value;
-        errorEl.innerText = '';
-        if (!email || !pass) { errorEl.innerText = 'Email dan Password wajib diisi!'; return; }
-        try {
-            if (isLogin) {
-                await auth.signInWithEmailAndPassword(email, pass);
-            } else {
-                await auth.createUserWithEmailAndPassword(email, pass);
-            }
-            if (rememberMeCheck.checked) {
-                localStorage.setItem('authEmail', email);
-                localStorage.setItem('authPass', pass);
-            } else {
-                localStorage.removeItem('authEmail');
-                localStorage.removeItem('authPass');
-            }
-        } catch (error) {
-            errorEl.innerText = error.message.replace('Firebase: ', '');
+    async saveItem(id) {
+        const siteName = document.getElementById('vaultSiteName').value.trim();
+        const website = document.getElementById('vaultWebsite').value.trim();
+        const email = document.getElementById('vaultEmail').value.trim();
+        const username = document.getElementById('vaultUsername').value.trim();
+        const password = document.getElementById('vaultPassword').value.trim();
+        const category = document.getElementById('vaultCategory').value;
+        const folder = document.getElementById('vaultFolder').value.trim();
+        if (!siteName || !password) {
+            Utils.showToast('Nama Website dan Password wajib diisi!', 'error');
+            return;
         }
-    };
-}
+        const item = { siteName, website, email, username, password, category, folder, updatedAt: new Date().toISOString() };
+        const uid = auth.currentUser?.uid;
+        if (!uid) return;
+        try {
+            if (id) {
+                await firebase.database().ref('users/' + uid + '/passwords/' + id).update(item);
+                Utils.showToast('✅ Akun diperbarui', 'success');
+            } else {
+                const ref = firebase.database().ref('users/' + uid + '/passwords').push();
+                item.createdAt = new Date().toISOString();
+                await ref.set(item);
+                Utils.showToast('✅ Akun ditambahkan', 'success');
+            }
+            app.closeModal();
+            app.refresh();
+        } catch (error) {
+            Utils.showToast('❌ Gagal menyimpan: ' + error.message, 'error');
+        }
+    },
 
-function logoutUser() { 
-    auth.signOut(); 
-}
+    showAddForm() {
+        const modal = document.getElementById('modalDialog');
+        const overlay = document.getElementById('modalOverlay');
+        if (!modal || !overlay) return;
+        overlay.className = 'modal-overlay';
+        modal.className = 'modal-dialog';
+        modal.innerHTML = `
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold m-0">➕ Tambah Akun</h5>
+                <button class="btn btn-icon" onclick="app.closeModal()"><i class="bx bx-x fs-4"></i></button>
+            </div>
+            <div class="p-3">
+                <div class="row g-2">
+                    <div class="col-12"><label class="form-label small">Nama Website</label><input class="form-control" id="vaultSiteName" placeholder="Contoh: Instagram"></div>
+                    <div class="col-12"><label class="form-label small">URL Website</label><input class="form-control" id="vaultWebsite" placeholder="https://..."></div>
+                    <div class="col-6"><label class="form-label small">Email</label><input class="form-control" id="vaultEmail" placeholder="email@domain"></div>
+                    <div class="col-6"><label class="form-label small">Username</label><input class="form-control" id="vaultUsername" placeholder="@username"></div>
+                    <div class="col-6"><label class="form-label small">Password</label><input class="form-control" id="vaultPassword" type="password" placeholder="Min 6 karakter"></div>
+                    <div class="col-6"><label class="form-label small">Kategori</label><select class="form-select" id="vaultCategory"><option>Email</option><option>Sosial</option><option>Banking</option><option>Lainnya</option></select></div>
+                    <div class="col-12"><label class="form-label small">Folder</label><input class="form-control" id="vaultFolder" placeholder="Contoh: Pekerjaan, Pribadi"></div>
+                </div>
+                <div class="d-flex gap-2 mt-3">
+                    <button class="btn btn-primary flex-fill" onclick="vaultModule.saveItem(null)"><i class="bx bx-save"></i> Simpan</button>
+                    <button class="btn btn-secondary flex-fill" onclick="app.closeModal()">Batal</button>
+                </div>
+            </div>
+        `;
+        overlay.classList.add('open');
+    },
 
-window.auth = auth;
-window.renderAuthPage = renderAuthPage;
-window.logoutUser = logoutUser;
+    copyText(text) {
+        if (!text) return Utils.showToast('Tidak ada teks untuk disalin', 'error');
+        navigator.clipboard?.writeText(text).then(() => Utils.showToast('📋 Disalin!', 'success'))
+            .catch(() => Utils.showToast('❌ Gagal menyalin', 'error'));
+    }
+};
 
-console.log('✅ Auth Module Loaded');
+window.vaultModule = vaultModule;
+console.log('✅ Vault Module Loaded');
