@@ -1,0 +1,39 @@
+/* Reset & Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+
+/* Loading Screen */
+.loading-screen { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fff; transition: opacity 0.5s; }
+.loading-screen.hidden { opacity: 0; pointer-events: none; }
+
+/* Sidebar Styling */
+.sidebar { width: 260px; height: 100vh; position: fixed; top: 0; left: -260px; transition: all 0.3s ease; z-index: 1040; }
+.sidebar.open { left: 0; }
+@media (min-width: 768px) {
+    .sidebar { left: 0; }
+    .main-content { margin-left: 260px; }
+    #menuToggle { display: none !important; }
+}
+
+/* Sidebar Links */
+.sidebar .nav-link { color: rgba(255,255,255,0.6); transition: all 0.2s; cursor: pointer;}
+.sidebar .nav-link:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.sidebar .nav-link.active { color: #fff; background: rgba(13, 110, 253, 0.3); border-left: 3px solid #0d6ef3; }
+.sidebar .nav-link i { font-size: 1.2rem; }
+
+/* Button Icon */
+.btn-icon { width: 40px; height: 40px; border: none; background: transparent; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
+.btn-icon:hover { background: rgba(0,0,0,0.05); }
+
+/* Dashboard Stats Cards */
+.stat-card .icon-wrapper { width: 48px; height: 48px; border-radius: 12px; display: flex; justify-content: center; align-items: center; color: white; }
+.stat-card .stat-number { font-size: 1.75rem; font-weight: 700; }
+
+/* Theme Override (Dark Mode) */
+[data-theme="dark"] body { background-color: #212529; color: #e9ecef; }
+[data-theme="dark"] .bg-white { background-color: #2c3035 !important; border-color: #495057 !important; }
+[data-theme="dark"] .bg-light { background-color: #1a1d20 !important; }
+[data-theme="dark"] .text-dark { color: #e9ecef !important; }
+[data-theme="dark"] .navbar { background-color: #2c3035 !important; border-color: #495057 !important; }
+[data-theme="dark"] .sidebar { background-color: #212529 !important; border-color: #343a40 !important; }
+[data-theme="dark"] .stat-card { background-color: #2c3035; border-color: #495057; }
