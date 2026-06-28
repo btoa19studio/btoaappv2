@@ -14,6 +14,8 @@ class App {
 
             if (user) {
                 this.user = user;
+                
+                // 💡 LOGIN BERHASIL: Munculkan Header & FAB
                 if(header) header.classList.remove('d-none');
                 if(fab) fab.classList.remove('d-none');
                 
@@ -28,6 +30,8 @@ class App {
             } else {
                 this.user = null;
                 this.isAppReady = false;
+                
+                // 💡 LOGOUT / BELUM LOGIN: Sembunyikan Header & FAB
                 if(header) header.classList.add('d-none');
                 if(fab) fab.classList.add('d-none');
 
@@ -173,10 +177,12 @@ class App {
         });
     }
 
+    // 🔥 PERBAIKAN PENTING: TOMBOL FAB
     setupFAB() { 
         const fab = document.getElementById('fabBtn');
         if(fab) {
             fab.onclick = () => {
+                // Jika user sedang di halaman Vault, tombol + akan membuka form tambah akun
                 if (this.currentPage === 'vault' && window.vaultModule && typeof window.vaultModule.showAddForm === 'function') {
                     window.vaultModule.showAddForm();
                 } else {
@@ -197,6 +203,7 @@ class App {
         const titles = { dashboard: '🏠 Dashboard', vault: '🔐 Vault', notes: '📝 Notes', todo: '✅ Todo', money: '💰 Money', travel: '🗺️ Travel' };
         document.getElementById('pageTitle').innerText = titles[page] || page;
 
+        // ✅ ROUTING HALAMAN
         if (page === 'dashboard') container.innerHTML = await window.dashboardModule.render();
         else if (page === 'vault') container.innerHTML = await window.vaultModule.render();
         else if (page === 'notes') container.innerHTML = await window.notesModule.render();
