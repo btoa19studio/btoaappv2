@@ -82,8 +82,8 @@ class App {
             this.setupSidebar();
             this.setupThemeToggle();
             this.setupCustomizer();
-            this.setupFAB();
             this.setupLogout();
+            this.setupFAB(); // Pastikan FAB dikonfigurasi di sini
             this.loadPage('dashboard');
         } catch(e) { 
             console.error("Error App Init:", e); 
@@ -173,9 +173,19 @@ class App {
         });
     }
 
+    // 🔥 PERBAIKAN PENTING: FUNGSI FAB DI SINI
     setupFAB() { 
         const fab = document.getElementById('fabBtn');
-        if(fab) fab.onclick = () => window.Utils.showToast('⚡ Fitur cepat siap dikembangkan!'); 
+        if(fab) {
+            fab.onclick = () => {
+                // Jika user sedang di halaman Vault, tombol + akan membuka form tambah akun
+                if (this.currentPage === 'vault' && window.vaultModule && typeof window.vaultModule.showAddForm === 'function') {
+                    window.vaultModule.showAddForm();
+                } else {
+                    Utils.showToast('⚡ Fitur cepat siap dikembangkan!', 'info');
+                }
+            };
+        }
     }
     
     async loadPage(page) {
@@ -189,7 +199,7 @@ class App {
         const titles = { dashboard: '🏠 Dashboard', vault: '🔐 Vault', notes: '📝 Notes', todo: '✅ Todo', money: '💰 Money', travel: '🗺️ Travel' };
         document.getElementById('pageTitle').innerText = titles[page] || page;
 
-        // ✅ ROUTING UNTUK VAULT
+        // ✅ ROUTING YANG BENAR
         if (page === 'dashboard') container.innerHTML = await window.dashboardModule.render();
         else if (page === 'vault') container.innerHTML = await window.vaultModule.render();
         else if (page === 'notes') container.innerHTML = await window.notesModule.render();
