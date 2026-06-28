@@ -8,65 +8,53 @@ class App {
     }
 
     async init() {
-        // Listener Status Login (SATU-SATUNYA TEMPAT MENGATUR UI)
         auth.onAuthStateChanged((user) => {
             const header = document.getElementById('appHeader');
             const fab = document.getElementById('fabBtn');
 
             if (user) {
-                // --- LOGIN BERHASIL ---
+                // LOGIN BERHASIL
                 this.user = user;
                 
-                // Tampilkan Header & FAB
                 if(header) header.classList.remove('d-none');
                 if(fab) fab.classList.remove('d-none');
-                
-                // Update Avatar
                 document.getElementById('userAvatar').innerText = user.email.charAt(0).toUpperCase();
 
-                // Muat Dashboard
                 this.loadDashboard();
                 this.isAppReady = true;
-                
-                // Hilangkan loading
                 document.getElementById('loadingScreen').classList.add('hidden');
             } else {
-                // --- LOGOUT / BELUM LOGIN ---
+                // LOGOUT / BELUM LOGIN
                 this.user = null;
                 this.isAppReady = false;
                 
-                // Sembunyikan Header & FAB
                 if(header) header.classList.add('d-none');
                 if(fab) fab.classList.add('d-none');
 
-                // Reset Sidebar Active State
+                // Reset Sidebar
                 document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(el => {
                     el.classList.remove('active');
                 });
                 document.getElementById('pageTitle').innerText = '🔐 Silakan Login';
 
-                // 💥 RESET KONTEN DASHBOARD DAN RENDER HALAMAN LOGIN
+                // 💥 PASTIKAN HANYA MENAMPILKAN LOGIN, TIDAK HAPUS DATA!
                 const container = document.getElementById('pageContainer');
-                container.innerHTML = ''; // Hapus paksa Dashboard
-                renderAuthPage(); // Tampilkan Form Login
+                container.innerHTML = ''; 
+                renderAuthPage(); // Data localStorage akan terbaca otomatis
                 
                 document.getElementById('loadingScreen').classList.add('hidden');
 
-                // 💡 FITUR DEMO (HANYA SAAT PERTAMA KALI BUKA APLIKASI)
-                // Jika aplikasi baru pertama kali dibuka (belum ada user), kita buat akun demo & login otomatis.
+                // Demo account (hanya 1x)
                 if (!localStorage.getItem('demoAccountCreated')) {
                     console.log('🛠️ Membuat akun demo pertama kali...');
                     const demoEmail = 'demo@user.com';
                     const demoPass = '123456';
-
                     auth.createUserWithEmailAndPassword(demoEmail, demoPass)
                         .then(() => {
                             console.log('✅ Akun demo berhasil dibuat. Login otomatis...');
                             localStorage.setItem('demoAccountCreated', 'true');
-                            // Kode akan otomatis masuk ke auth.onAuthStateChanged bagian 'user' di atas.
                         })
                         .catch((err) => {
-                            // Jika akun demo sudah ada tapi gagal login (misal user logout manual), jangan buat lagi.
                             if (err.code !== 'auth/email-already-in-use') {
                                 console.error('Gagal membuat akun demo:', err.message);
                             }
@@ -83,7 +71,6 @@ class App {
             this.setupCustomizer();
             this.setupFAB();
             this.setupLogout();
-            
             this.loadPage('dashboard');
         } catch(e) { 
             console.error("Error App Init:", e); 
@@ -94,7 +81,7 @@ class App {
         document.getElementById('logoutBtn').onclick = (e) => {
             e.preventDefault();
             if(confirm('Apakah Anda yakin ingin keluar?')) {
-                logoutUser(); // Fungsi dari auth.js
+                logoutUser(); // Fungsi dari auth.js (hanya signOut)
             }
         };
     }
@@ -179,7 +166,6 @@ class App {
     }
     
     async loadPage(page) {
-        // Hanya izinkan load page jika user sudah login
         if (!this.user) return;
 
         this.currentPage = page;
@@ -202,7 +188,6 @@ class App {
     }
 }
 
-// START APLIKASI
 const app = new App();
 window.app = app;
 
