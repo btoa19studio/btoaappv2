@@ -18,7 +18,7 @@ try {
 }
 const auth = firebase.auth();
 
-// 2. Fungsi Render Halaman Login / Signup
+// 2. Render Halaman Login / Signup (Dengan Checkbox Ingat Saya)
 function renderAuthPage() {
     const container = document.getElementById('pageContainer');
     if (!container) return;
@@ -41,6 +41,15 @@ function renderAuthPage() {
                             <label class="form-label text-muted small">Password</label>
                             <input type="password" class="form-control" id="authPassword" placeholder="Min 6 karakter">
                         </div>
+                        
+                        <!-- 🔥 FITUR BARU: CHECKBOX INGAT SAYA -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                            <label class="form-check-label text-muted small" for="rememberMe">
+                                Ingat saya
+                            </label>
+                        </div>
+
                         <button class="btn btn-primary w-100 mb-3" id="authSubmitBtn">Masuk</button>
                     </div>
 
@@ -54,13 +63,23 @@ function renderAuthPage() {
         </div>
     `;
 
-    // Toggle Login / Signup
+    // --- 1. LOAD DATA DARI LOCALSTORAGE SAAT HALAMAN DIBUKA ---
+    const savedEmail = localStorage.getItem('authEmail');
+    const savedPass = localStorage.getItem('authPass');
+    if (savedEmail) document.getElementById('authEmail').value = savedEmail;
+    if (savedPass) document.getElementById('authPassword').value = savedPass;
+    if (savedEmail && savedPass) document.getElementById('rememberMe').checked = true;
+
+    // --- 2. TOGGLE LOGIN / SIGNUP ---
     let isLogin = true;
     const title = document.getElementById('authTitle');
     const btn = document.getElementById('authSubmitBtn');
     const toggleText = document.getElementById('authToggleText');
     const toggleLink = document.getElementById('authToggleLink');
     const errorEl = document.getElementById('authError');
+    const emailInput = document.getElementById('authEmail');
+    const passInput = document.getElementById('authPassword');
+    const rememberMeCheck = document.getElementById('rememberMe');
 
     toggleLink.onclick = (e) => {
         e.preventDefault();
@@ -70,12 +89,19 @@ function renderAuthPage() {
         toggleText.innerText = isLogin ? 'Belum punya akun?' : 'Sudah punya akun?';
         toggleLink.innerText = isLogin ? 'Daftar Sekarang' : 'Masuk';
         errorEl.innerText = '';
+        
+        // Saat toggle mode, reset form & hapus data tersimpan
+        emailInput.value = '';
+        passInput.value = '';
+        rememberMeCheck.checked = false;
+        localStorage.removeItem('authEmail');
+        localStorage.removeItem('authPass');
     };
 
-    // Submit
+    // --- 3. LOGIKA SUBMIT (LOGIN / DAFTAR) ---
     btn.onclick = async () => {
-        const email = document.getElementById('authEmail').value;
-        const pass = document.getElementById('authPassword').value;
+        const email = emailInput.value.trim();
+        const pass = passInput.value;
         errorEl.innerText = '';
 
         if (!email || !pass) { errorEl.innerText = 'Email dan Password wajib diisi!'; return; }
@@ -86,20 +112,32 @@ function renderAuthPage() {
             } else {
                 await auth.createUserWithEmailAndPassword(email, pass);
             }
+
+            // --- 4. SIMPAN DATA JIKA CHECKBOX DICENTANG ---
+            if (rememberMeCheck.checked) {
+                localStorage.setItem('authEmail', email);
+                localStorage.setItem('authPass', pass);
+            } else {
+                localStorage.removeItem('authEmail');
+                localStorage.removeItem('authPass');
+            }
+
         } catch (error) {
             errorEl.innerText = error.message.replace('Firebase: ', '');
         }
     };
 }
 
-// 3. Logout
+// 3. Logout (Hapus data localStorage saat user keluar)
 function logoutUser() { 
+    localStorage.removeItem('authEmail');
+    localStorage.removeItem('authPass');
     auth.signOut(); 
 }
 
-// 4. Ekspor ke Global (Hanya fungsi murni, tanpa auto-login)
+// 4. Ekspor ke Global
 window.auth = auth;
 window.renderAuthPage = renderAuthPage;
 window.logoutUser = logoutUser;
 
-console.log('✅ Auth Module (Pure) Loaded');
+console.log('✅ Auth Module (With Remember Me) Loaded');
