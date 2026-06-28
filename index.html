@@ -14,16 +14,13 @@
 </head>
 <body>
 
-    <!-- PRELOADER -->
     <div id="loadingScreen" class="loading-screen">
         <div class="spinner-border text-primary" role="status"></div>
         <p class="mt-2 text-muted">Memuat Aplikasi...</p>
     </div>
 
-    <!-- OVERLAY SIDEBAR -->
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-    <!-- SIDEBAR (GELAP) -->
     <div class="sidebar bg-dark text-white" id="sidebar">
         <div class="sidebar-header p-3 border-bottom border-secondary">
             <div class="d-flex align-items-center justify-content-between">
@@ -34,7 +31,6 @@
                 <button class="btn btn-sm btn-outline-light d-md-none" id="closeSidebar"><i class='bx bx-x'></i></button>
             </div>
         </div>
-
         <div class="sidebar-nav px-3 py-4">
             <p class="text-secondary text-uppercase small fw-bold mb-3 px-2">Utama</p>
             <a href="#" class="nav-link active d-flex align-items-center gap-2 p-2 mb-2 rounded" data-page="dashboard">
@@ -56,7 +52,6 @@
             <a href="#" class="nav-link d-flex align-items-center gap-2 p-2 mb-2 rounded" data-page="travel">
                 <i class='bx bxs-map fs-5'></i> <span>Travel Tracker</span>
             </a>
-
             <p class="text-secondary text-uppercase small fw-bold mt-4 mb-3 px-2">Pengaturan</p>
             <a href="#" class="nav-link d-flex align-items-center gap-2 p-2 mb-2 rounded" id="customizerBtn">
                 <i class='bx bxs-cog fs-5'></i> <span>Customizer</span>
@@ -67,9 +62,7 @@
         </div>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="main-content bg-white" id="mainContent">
-        <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-3 py-2 d-none" id="appHeader">
             <div class="d-flex align-items-center gap-3 w-100">
                 <button class="btn btn-icon text-dark d-md-none" id="menuToggle"><i class='bx bx-menu fs-3'></i></button>
@@ -78,13 +71,10 @@
                 <div class="ms-auto d-flex align-items-center gap-2 position-relative">
                     <button class="btn btn-icon text-dark" id="themeToggle"><i class='bx bx-moon fs-4'></i></button>
                     
-                    <!-- 🔥 AVATAR SEBAGAI TOMBOL DROPDOWN -->
                     <div class="dropdown">
                         <button class="btn btn-link p-0 border-0 dropdown-toggle" type="button" id="profileDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; font-weight: 600;" id="userAvatar">A</div>
                         </button>
-                        
-                        <!-- Menu Dropdown Profil -->
                         <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 p-0" style="min-width: 220px; overflow: hidden;" aria-labelledby="profileDropdownBtn">
                             <li class="p-3 bg-light border-bottom" style="cursor: default;">
                                 <div class="d-flex align-items-center gap-3">
@@ -104,11 +94,9 @@
             </div>
         </nav>
 
-        <!-- Page Container -->
         <div class="p-4 bg-light" id="pageContainer" style="min-height: calc(100vh - 64px);"></div>
     </div>
 
-    <!-- MODALS CUSTOMIZER -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="customizerOffcanvas">
         <div class="offcanvas-header border-bottom">
             <h5 class="offcanvas-title">Customizer</h5>
