@@ -1,103 +1,24 @@
-/* Reset & Font */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-
-/* Loading Screen */
-.loading-screen { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fff; transition: opacity 0.3s; }
-.loading-screen.hidden { opacity: 0; pointer-events: none; display: none !important; }
-
-/* Sidebar Overlay (Fitur Klik Area Kosong untuk Menutup) */
-.sidebar-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1039; /* Di bawah sidebar (1040), di atas konten */
-    background: rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    visibility: hidden;
+/* Gaya untuk modul Lokasi Saya */
+#locationDisplay {
     transition: all 0.3s ease;
-    pointer-events: none;
-}
-.sidebar-overlay.active {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: all;
 }
 
-/* Sidebar Styling */
-.sidebar { width: 260px; height: 100vh; position: fixed; top: 0; left: -260px; transition: all 0.3s ease; z-index: 1040; }
-.sidebar.open { left: 0; }
-@media (min-width: 768px) {
-    .sidebar { left: 0; }
-    .sidebar-overlay { display: none !important; } /* Sembunyikan overlay di desktop */
-    .main-content { margin-left: 260px; }
-    #menuToggle { display: none !important; }
+#locationDisplay .spinner-border {
+    display: inline-block;
 }
 
-/* Sidebar Links */
-.sidebar .nav-link { color: rgba(255,255,255,0.6); transition: all 0.2s; cursor: pointer;}
-.sidebar .nav-link:hover { color: #fff; background: rgba(255,255,255,0.1); }
-.sidebar .nav-link.active { color: #fff; background: rgba(13, 110, 253, 0.3); border-left: 3px solid #0d6ef3; }
-.sidebar .nav-link i { font-size: 1.2rem; }
-
-/* Button Icon */
-.btn-icon { width: 40px; height: 40px; border: none; background: transparent; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.2s; cursor: pointer;}
-.btn-icon:hover { background: rgba(0,0,0,0.05); }
-
-/* Dashboard Stats Cards */
-.stat-card .icon-wrapper { width: 48px; height: 48px; border-radius: 12px; display: flex; justify-content: center; align-items: center; color: white; }
-.stat-card .stat-number { font-size: 1.75rem; font-weight: 700; }
-
-/* Theme Override (Dark Mode) */
-[data-theme="dark"] body { background-color: #212529; color: #e9ecef; }
-[data-theme="dark"] .bg-white { background-color: #2c3035 !important; border-color: #495057 !important; }
-[data-theme="dark"] .bg-light { background-color: #1a1d20 !important; }
-[data-theme="dark"] .text-dark { color: #e9ecef !important; }
-[data-theme="dark"] .navbar { background-color: #2c3035 !important; border-color: #495057 !important; }
-[data-theme="dark"] .sidebar { background-color: #212529 !important; border-color: #343a40 !important; }
-[data-theme="dark"] .stat-card { background-color: #2c3035; border-color: #495057; }
-
-/* ---- Gaya Tambahan untuk Dropdown Profil ---- */
-.dropdown-toggle::after {
-    display: none !important; /* Sembunyikan panah default Bootstrap */
+/* Status GPS update */
+.text-muted strong {
+    color: var(--text-primary, #333);
+    font-weight: 600;
 }
 
-.dropdown-menu {
-    top: 100% !important;
-    margin-top: 8px !important;
-}
-
-.dropdown-item {
-    transition: background 0.2s ease;
-}
-
-.dropdown-item:hover {
-    background: rgba(13, 110, 253, 0.05);
-}
-
-.dropdown-item.text-danger:hover {
-    background: rgba(220, 53, 69, 0.05);
-}
-
-/* Pastikan avatar di navbar tidak border saat jadi tombol */
-#profileDropdownBtn:focus {
-    box-shadow: none;
-}
-
-/* Di dark mode, sesuaikan dropdown agar tetap terbaca */
-[data-theme="dark"] .dropdown-menu {
-    background-color: #2c3035;
-    border-color: #495057;
-}
-[data-theme="dark"] .dropdown-menu .bg-light {
-    background-color: #212529 !important;
-    border-color: #495057 !important;
-}
-[data-theme="dark"] .dropdown-menu .text-dark {
-    color: #e9ecef !important;
-}
-[data-theme="dark"] .dropdown-menu .text-muted {
-    color: #adb5bd !important;
-}
-[data-theme="dark"] .dropdown-divider {
-    border-color: #495057;
+/* Responsif untuk Mobile */
+@media (max-width: 576px) {
+    #locationDisplay {
+        padding: 12px !important;
+    }
+    #locationDisplay .fs-2 {
+        font-size: 1.5rem !important;
+    }
 }
