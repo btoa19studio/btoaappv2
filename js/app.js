@@ -1,16 +1,28 @@
 'use strict';
+
 class App {
-    constructor() { this.currentPage = 'dashboard'; }
+    constructor() { 
+        this.currentPage = 'dashboard'; 
+    }
+
     async init() {
         try {
+            // Setup semua komponen UI
             this.setupSidebar();
             this.setupThemeToggle();
             this.setupCustomizer();
             this.setupFAB();
+            
+            // Muat halaman pertama
             await this.loadPage('dashboard');
+            
+            // Hilangkan loading screen
             document.getElementById('loadingScreen').classList.add('hidden');
-        } catch(e) { console.error(e); }
+        } catch(e) { 
+            console.error("Error App Init:", e); 
+        }
     }
+
     setupSidebar() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
@@ -24,7 +36,6 @@ class App {
                 overlay.classList.remove('active');
                 return;
             }
-            // Toggle class
             sidebar.classList.toggle('open');
             // Sync overlay
             if (sidebar.classList.contains('open')) {
@@ -34,47 +45,58 @@ class App {
             }
         };
 
-        // Event listener untuk tombol menu mobile
+        // 1. Event tombol hamburger (Mobile)
         if(menuToggle) menuToggle.onclick = () => toggleMobileSidebar();
 
-        // Event listener untuk tombol close (X) di sidebar mobile
+        // 2. Event tombol close (X) di sidebar (Mobile)
         if(closeSidebar) closeSidebar.onclick = () => toggleMobileSidebar(true);
 
-        // Event listener untuk overlay (klik area kosong)
+        // 3. Event klik area kosong (Overlay) untuk menutup sidebar
         if(overlay) overlay.onclick = () => toggleMobileSidebar(true);
 
-        // Toggle untuk Desktop (Collapse) - Hanya di Desktop
+        // 4. Toggle Collapse Sidebar (Desktop)
         document.getElementById('sidebarToggle').onclick = () => {
             sidebar.classList.toggle('d-none');
             document.getElementById('mainContent').classList.toggle('ms-0');
         };
 
-        // Navigasi Link (Jika menu diklik, sidebar mobile otomatis menutup)
+        // 5. Navigasi Link (Otomatis tutup sidebar setelah klik di mobile)
         document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(el => {
             el.onclick = (e) => { 
                 e.preventDefault(); 
-                this.loadPage(el.dataset.page);
-                // Tutup sidebar setelah klik link (di mobile)
+                const page = el.dataset.page;
+                this.loadPage(page);
+                
+                // Jika di mobile, tutup sidebar setelah pindah halaman
                 if (window.innerWidth < 768) {
                     toggleMobileSidebar(true);
                 }
             };
         });
     }
+
     setupThemeToggle() {
-        document.getElementById('themeToggle').onclick = () => {
-            const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            document.getElementById('themeToggle').innerHTML = next === 'dark' ? '<i class=\'bx bx-sun fs-4\'></i>' : '<i class=\'bx bx-moon fs-4\'></i>';
-            localStorage.setItem('theme', next);
-        };
+        const themeToggle = document.getElementById('themeToggle');
+        if(themeToggle) {
+            themeToggle.onclick = () => {
+                const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                themeToggle.innerHTML = next === 'dark' ? '<i class=\'bx bx-sun fs-4\'></i>' : '<i class=\'bx bx-moon fs-4\'></i>';
+                localStorage.setItem('theme', next);
+            };
+        }
     }
+
     setupCustomizer() {
-        document.getElementById('customizerBtn').onclick = (e) => {
-            e.preventDefault();
-            const offcanvas = new bootstrap.Offcanvas(document.getElementById('customizerOffcanvas'));
-            offcanvas.show();
-        };
+        const customizerBtn = document.getElementById('customizerBtn');
+        if(customizerBtn) {
+            customizerBtn.onclick = (e) => {
+                e.preventDefault();
+                const offcanvas = new bootstrap.Offcanvas(document.getElementById('customizerOffcanvas'));
+                offcanvas.show();
+            };
+        }
+
         document.querySelectorAll('.theme-btn').forEach(btn => {
             btn.onclick = () => {
                 const theme = btn.dataset.theme;
@@ -85,11 +107,17 @@ class App {
             };
         });
     }
-    setupFAB() { document.getElementById('fabBtn').onclick = () => Utils.showToast('Fitur siap dikembangkan!'); }
+
+    setupFAB() { 
+        const fab = document.getElementById('fabBtn');
+        if(fab) fab.onclick = () => window.Utils.showToast('⚡ Fitur cepat siap dikembangkan!'); 
+    }
     
     async loadPage(page) {
         this.currentPage = page;
         const container = document.getElementById('pageContainer');
+        
+        // Update active class di sidebar
         document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(el => {
             el.classList.toggle('active', el.dataset.page === page);
         });
@@ -98,16 +126,24 @@ class App {
         const titles = { dashboard: '🏠 Dashboard', vault: '🔐 Vault', notes: '📝 Notes', todo: '✅ Todo', money: '💰 Money', travel: '🗺️ Travel' };
         document.getElementById('pageTitle').innerText = titles[page] || page;
 
-        // Render Konten
+        // Render Konten berdasarkan halaman
         if(page === 'dashboard') container.innerHTML = await window.dashboardModule.render();
         else if(page === 'vault') container.innerHTML = await window.vaultModule.render();
         else if(page === 'notes') container.innerHTML = await window.notesModule.render();
         else if(page === 'todo') container.innerHTML = await window.todoModule.render();
         else if(page === 'money') container.innerHTML = await window.moneyModule.render();
         else if(page === 'travel') container.innerHTML = await window.travelModule.render();
+        else container.innerHTML = '<div class="card p-4"><p>Halaman tidak ditemukan</p></div>';
     }
 }
 
-// Mulai App
-window.app = new App();
-document.addEventListener('DOMContentLoaded', () => window.app.init());
+// START APLIKASI
+const app = new App();
+window.app = app; // Ekspor ke window agar bisa diakses jika diperlukan
+
+// Tunggu DOM siap, lalu jalankan init
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => app.init());
+} else {
+    app.init();
+}
