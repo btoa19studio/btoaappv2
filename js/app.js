@@ -4,32 +4,74 @@ class App {
     constructor() { 
         this.currentPage = 'dashboard'; 
         this.user = null;
+        this.isAppReady = false;
     }
 
     async init() {
+        // Listener Status Login (SATU-SATUNYA TEMPAT MENGATUR UI)
         auth.onAuthStateChanged((user) => {
+            const header = document.getElementById('appHeader');
+            const fab = document.getElementById('fabBtn');
+
             if (user) {
-                // LOGIN BERHASIL
+                // --- LOGIN BERHASIL ---
                 this.user = user;
+                
+                // Tampilkan Header & FAB
+                if(header) header.classList.remove('d-none');
+                if(fab) fab.classList.remove('d-none');
+                
+                // Update Avatar
                 document.getElementById('userAvatar').innerText = user.email.charAt(0).toUpperCase();
-                document.getElementById('appHeader').classList.remove('d-none');
-                document.getElementById('fabBtn').classList.remove('d-none');
+
+                // Muat Dashboard
                 this.loadDashboard();
+                this.isAppReady = true;
+                
+                // Hilangkan loading
                 document.getElementById('loadingScreen').classList.add('hidden');
             } else {
-                // LOGOUT ATAU BELUM LOGIN
+                // --- LOGOUT / BELUM LOGIN ---
                 this.user = null;
-                document.getElementById('appHeader').classList.add('d-none');
-                document.getElementById('fabBtn').classList.add('d-none');
+                this.isAppReady = false;
                 
-                // 💥 PASTIKAN RENDER HALAMAN LOGIN
-                renderAuthPage(); 
-                document.getElementById('loadingScreen').classList.add('hidden');
-                
-                // Reset halaman aktif di sidebar
+                // Sembunyikan Header & FAB
+                if(header) header.classList.add('d-none');
+                if(fab) fab.classList.add('d-none');
+
+                // Reset Sidebar Active State
                 document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(el => {
                     el.classList.remove('active');
                 });
+                document.getElementById('pageTitle').innerText = '🔐 Silakan Login';
+
+                // 💥 RESET KONTEN DASHBOARD DAN RENDER HALAMAN LOGIN
+                const container = document.getElementById('pageContainer');
+                container.innerHTML = ''; // Hapus paksa Dashboard
+                renderAuthPage(); // Tampilkan Form Login
+                
+                document.getElementById('loadingScreen').classList.add('hidden');
+
+                // 💡 FITUR DEMO (HANYA SAAT PERTAMA KALI BUKA APLIKASI)
+                // Jika aplikasi baru pertama kali dibuka (belum ada user), kita buat akun demo & login otomatis.
+                if (!localStorage.getItem('demoAccountCreated')) {
+                    console.log('🛠️ Membuat akun demo pertama kali...');
+                    const demoEmail = 'demo@user.com';
+                    const demoPass = '123456';
+
+                    auth.createUserWithEmailAndPassword(demoEmail, demoPass)
+                        .then(() => {
+                            console.log('✅ Akun demo berhasil dibuat. Login otomatis...');
+                            localStorage.setItem('demoAccountCreated', 'true');
+                            // Kode akan otomatis masuk ke auth.onAuthStateChanged bagian 'user' di atas.
+                        })
+                        .catch((err) => {
+                            // Jika akun demo sudah ada tapi gagal login (misal user logout manual), jangan buat lagi.
+                            if (err.code !== 'auth/email-already-in-use') {
+                                console.error('Gagal membuat akun demo:', err.message);
+                            }
+                        });
+                }
             }
         });
     }
@@ -52,7 +94,7 @@ class App {
         document.getElementById('logoutBtn').onclick = (e) => {
             e.preventDefault();
             if(confirm('Apakah Anda yakin ingin keluar?')) {
-                logoutUser();
+                logoutUser(); // Fungsi dari auth.js
             }
         };
     }
