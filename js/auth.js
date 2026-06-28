@@ -23,7 +23,6 @@ function renderAuthPage() {
     const container = document.getElementById('pageContainer');
     if (!container) return;
 
-    // Reset total container
     container.innerHTML = '';
 
     container.innerHTML = `
@@ -42,7 +41,6 @@ function renderAuthPage() {
                             <input type="password" class="form-control" id="authPassword" placeholder="Min 6 karakter">
                         </div>
                         
-                        <!-- 🔥 CHECKBOX DIPERJELAS DENGAN STYLE LANGSUNG -->
                         <div class="form-check mb-3 d-flex align-items-center">
                             <input class="form-check-input" type="checkbox" id="rememberMe" 
                                    style="width: 18px; height: 18px; margin-right: 10px; cursor: pointer;">
@@ -64,11 +62,12 @@ function renderAuthPage() {
         </div>
     `;
 
-    // --- 1. LOAD DATA DARI LOCALSTORAGE ---
+    // --- 1. LOAD DATA DARI LOCALSTORAGE SAAT HALAMAN DIBUKA ---
     const savedEmail = localStorage.getItem('authEmail');
     const savedPass = localStorage.getItem('authPass');
     if (savedEmail) document.getElementById('authEmail').value = savedEmail;
     if (savedPass) document.getElementById('authPassword').value = savedPass;
+    // Jika data tersimpan, centang checkbox otomatis agar user tahu data akan disimpan lagi
     if (savedEmail && savedPass) document.getElementById('rememberMe').checked = true;
 
     // --- 2. TOGGLE LOGIN / SIGNUP ---
@@ -91,6 +90,7 @@ function renderAuthPage() {
         toggleLink.innerText = isLogin ? 'Daftar Sekarang' : 'Masuk';
         errorEl.innerText = '';
         
+        // Saat ganti mode, kosongkan form dan hapus data simpanan
         emailInput.value = '';
         passInput.value = '';
         rememberMeCheck.checked = false;
@@ -98,7 +98,7 @@ function renderAuthPage() {
         localStorage.removeItem('authPass');
     };
 
-    // --- 3. LOGIKA SUBMIT ---
+    // --- 3. LOGIKA SUBMIT (LOGIN / DAFTAR) ---
     btn.onclick = async () => {
         const email = emailInput.value.trim();
         const pass = passInput.value;
@@ -128,10 +128,10 @@ function renderAuthPage() {
     };
 }
 
-// 3. Logout
+// 3. Logout (PERBAIKAN: HAPUS KODE `localStorage.removeItem`)
 function logoutUser() { 
-    localStorage.removeItem('authEmail');
-    localStorage.removeItem('authPass');
+    // 💡 KUNCI PERBAIKAN: Kami TIDAK menghapus localStorage di sini.
+    // Tujuannya agar saat halaman login muncul kembali, email tetap terisi.
     auth.signOut(); 
 }
 
@@ -140,4 +140,4 @@ window.auth = auth;
 window.renderAuthPage = renderAuthPage;
 window.logoutUser = logoutUser;
 
-console.log('✅ Auth Module (With Visible Checkbox) Loaded');
+console.log('✅ Auth Module (Logout Keeps Data) Loaded');
