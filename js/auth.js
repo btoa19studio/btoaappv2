@@ -16,12 +16,7 @@ const auth = firebase.auth();
 function renderAuthPage() {
     const container = document.getElementById('pageContainer');
     
-    // 💥 METODE KUAT: Hilangkan Header dan FAB menggunakan style.display langsung
-    const header = document.getElementById('appHeader');
-    const fab = document.getElementById('fabBtn');
-    if(header) header.style.display = 'none';
-    if(fab) fab.style.display = 'none';
-
+    // HANYA MERENDER FORM - TANPA ADA KODE HIDE ELEMEN!
     container.innerHTML = `
         <div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
             <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px;">
