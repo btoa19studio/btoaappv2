@@ -417,6 +417,5 @@ const vaultModule = {
     }
 };
 
-// 🔥 PASTIKAN DIDAFTARKAN KE GLOBAL
 window.vaultModule = vaultModule;
 console.log('✅ Vault Module Loaded');
