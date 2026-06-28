@@ -1,6 +1,5 @@
 'use strict';
 
-// 1. Inisialisasi Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyA4BVxcbPKWzyTZaQp5xyN9bluEcSNINnE",
     authDomain: "allinoneapp-b5578.firebaseapp.com",
@@ -18,7 +17,6 @@ try {
 }
 const auth = firebase.auth();
 
-// 2. Render Halaman Login / Signup
 function renderAuthPage() {
     const container = document.getElementById('pageContainer');
     if (!container) return;
@@ -62,15 +60,14 @@ function renderAuthPage() {
         </div>
     `;
 
-    // --- 1. LOAD DATA DARI LOCALSTORAGE SAAT HALAMAN DIBUKA ---
+    // Load data dari localStorage
     const savedEmail = localStorage.getItem('authEmail');
     const savedPass = localStorage.getItem('authPass');
     if (savedEmail) document.getElementById('authEmail').value = savedEmail;
     if (savedPass) document.getElementById('authPassword').value = savedPass;
-    // Jika data tersimpan, centang checkbox otomatis agar user tahu data akan disimpan lagi
     if (savedEmail && savedPass) document.getElementById('rememberMe').checked = true;
 
-    // --- 2. TOGGLE LOGIN / SIGNUP ---
+    // Toggle Login / Signup
     let isLogin = true;
     const title = document.getElementById('authTitle');
     const btn = document.getElementById('authSubmitBtn');
@@ -90,7 +87,7 @@ function renderAuthPage() {
         toggleLink.innerText = isLogin ? 'Daftar Sekarang' : 'Masuk';
         errorEl.innerText = '';
         
-        // Saat ganti mode, kosongkan form dan hapus data simpanan
+        // Saat toggle, bersihkan form & localStorage
         emailInput.value = '';
         passInput.value = '';
         rememberMeCheck.checked = false;
@@ -98,7 +95,7 @@ function renderAuthPage() {
         localStorage.removeItem('authPass');
     };
 
-    // --- 3. LOGIKA SUBMIT (LOGIN / DAFTAR) ---
+    // Submit
     btn.onclick = async () => {
         const email = emailInput.value.trim();
         const pass = passInput.value;
@@ -113,7 +110,7 @@ function renderAuthPage() {
                 await auth.createUserWithEmailAndPassword(email, pass);
             }
 
-            // --- 4. SIMPAN DATA JIKA CHECKBOX DICENTANG ---
+            // Simpan jika checkbox dicentang
             if (rememberMeCheck.checked) {
                 localStorage.setItem('authEmail', email);
                 localStorage.setItem('authPass', pass);
@@ -128,16 +125,13 @@ function renderAuthPage() {
     };
 }
 
-// 3. Logout (PERBAIKAN: HAPUS KODE `localStorage.removeItem`)
+// Logout: hanya signOut, TIDAK hapus data!
 function logoutUser() { 
-    // 💡 KUNCI PERBAIKAN: Kami TIDAK menghapus localStorage di sini.
-    // Tujuannya agar saat halaman login muncul kembali, email tetap terisi.
     auth.signOut(); 
 }
 
-// 4. Ekspor ke Global
 window.auth = auth;
 window.renderAuthPage = renderAuthPage;
 window.logoutUser = logoutUser;
 
-console.log('✅ Auth Module (Logout Keeps Data) Loaded');
+console.log('✅ Auth Module Final (Logout Keeps Data)');
