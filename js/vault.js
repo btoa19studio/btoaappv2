@@ -26,16 +26,12 @@ const vaultModule = {
             });
             this.folders = Array.from(folderSet);
             this.filteredData = [...this.data];
-            this.expandAllFolders();
+            this.expandedFolders = [...this.folders, '_uncategorized'];
         } catch (e) {
             console.error('Gagal load vault:', e);
             this.data = [];
             this.filteredData = [];
         }
-    },
-
-    expandAllFolders() {
-        this.expandedFolders = [...this.folders, '_uncategorized'];
     },
 
     async render() {
@@ -72,7 +68,7 @@ const vaultModule = {
 
     renderFolders() {
         if (this.filteredData.length === 0) {
-            return `<div class="text-center text-muted py-5"><i class='bx bx-lock-open fs-1'></i><p>Belum ada akun tersimpan.</p></div>`;
+            return `<div class="text-center text-muted py-5"><i class='bx bx-lock-open fs-1'></i><p>Belum ada akun tersimpan. Klik + untuk menambahkan.</p></div>`;
         }
 
         const grouped = {};
@@ -301,7 +297,6 @@ const vaultModule = {
         `;
         overlay.classList.add('open');
 
-        // Inisialisasi Editor.js
         this.initEditor(isEdit ? item.note : '');
     },
 
@@ -422,4 +417,6 @@ const vaultModule = {
     }
 };
 
+// 🔥 PASTIKAN DIDAFTARKAN KE GLOBAL
 window.vaultModule = vaultModule;
+console.log('✅ Vault Module Loaded');
