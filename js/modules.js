@@ -1,4 +1,3 @@
-
 'use strict';
 
 const Utils = {
@@ -17,16 +16,18 @@ const Utils = {
     formatCurrency: (amount) => 'Rp ' + (amount || 0)
 };
 
-// Ambil modul dari window (jika sudah didefinisikan di file lain)
-const vaultModule = window.vaultModule || { render: async () => '<p>🔐 Vault</p>' };
+// 🔥 PERBAIKAN PENTING: HAPUS FALLBACK, JANGAN TIMPA VAULT MODULE!
+window.Utils = Utils;
+
+// Daftarkan modul lain sebagai placeholder (tidak mengganggu vault)
 const notesModule = { render: async () => `<div class="card p-4"><h4 class="text-muted fw-bold">📝 Notes</h4><p class="text-muted">Fitur dalam pengembangan.</p></div>` };
 const todoModule = { render: async () => `<div class="card p-4"><h4 class="text-muted fw-bold">✅ Todo</h4><p class="text-muted">Fitur dalam pengembangan.</p></div>` };
 const moneyModule = { render: async () => `<div class="card p-4"><h4 class="text-muted fw-bold">💰 Money</h4><p class="text-muted">Fitur dalam pengembangan.</p></div>` };
 const travelModule = { render: async () => `<div class="card p-4"><h4 class="text-muted fw-bold">🗺️ Travel</h4><p class="text-muted">Fitur dalam pengembangan.</p></div>` };
 
-window.Utils = Utils;
-window.vaultModule = vaultModule;
 window.notesModule = notesModule;
 window.todoModule = todoModule;
 window.moneyModule = moneyModule;
 window.travelModule = travelModule;
+
+// ✅ VAULT TIDAK BOLEH DIDEFINISIKAN DI SINI, BIARKAN `vault.js` YANG MENDEFINISIKANNYA
