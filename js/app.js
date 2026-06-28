@@ -7,14 +7,12 @@ class App {
     }
 
     async init() {
-        // 1. Cek status Login terlebih dahulu
         auth.onAuthStateChanged((user) => {
             if (user) {
                 this.user = user;
                 document.getElementById('userAvatar').innerText = user.email.charAt(0).toUpperCase();
                 this.loadDashboard();
             } else {
-                // Jika belum login, tampilkan halaman login
                 renderAuthPage();
                 document.getElementById('loadingScreen').classList.add('hidden');
             }
@@ -23,9 +21,11 @@ class App {
 
     loadDashboard() {
         try {
-            // 💡 MUNCULKAN KEMBALI HEADER DAN FAB SAAT LOGIN BERHASIL
-            document.getElementById('appHeader').classList.remove('d-none');
-            document.getElementById('fabBtn').classList.remove('d-none');
+            // 💥 KEMBALIKAN HEADER DAN FAB SETELAH LOGIN BERHASIL
+            const header = document.getElementById('appHeader');
+            const fab = document.getElementById('fabBtn');
+            if(header) header.style.display = 'flex'; // Navbar default display flex
+            if(fab) fab.style.display = 'flex';      // FAB default display flex
 
             this.setupSidebar();
             this.setupThemeToggle();
@@ -33,10 +33,7 @@ class App {
             this.setupFAB();
             this.setupLogout();
             
-            // Muat halaman pertama
             this.loadPage('dashboard');
-            
-            // Hilangkan loading screen
             document.getElementById('loadingScreen').classList.add('hidden');
         } catch(e) { 
             console.error("Error App Init:", e); 
