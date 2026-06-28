@@ -4,7 +4,6 @@ class App {
     constructor() { 
         this.currentPage = 'dashboard'; 
         this.user = null;
-        this.isAppReady = false;
     }
 
     async init() {
@@ -14,8 +13,6 @@ class App {
 
             if (user) {
                 this.user = user;
-                
-                // 💡 LOGIN BERHASIL: Munculkan Header & FAB
                 if(header) header.classList.remove('d-none');
                 if(fab) fab.classList.remove('d-none');
                 
@@ -25,13 +22,9 @@ class App {
                 document.getElementById('dropdownEmail').innerText = user.email;
 
                 this.loadDashboard();
-                this.isAppReady = true;
                 document.getElementById('loadingScreen').classList.add('hidden');
             } else {
                 this.user = null;
-                this.isAppReady = false;
-                
-                // 💡 LOGOUT / BELUM LOGIN: Sembunyikan Header & FAB
                 if(header) header.classList.add('d-none');
                 if(fab) fab.classList.add('d-none');
 
@@ -103,6 +96,7 @@ class App {
         };
     }
 
+    // 🔥 PERBAIKAN PENTING DI SINI
     setupSidebar() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
@@ -132,13 +126,16 @@ class App {
             document.getElementById('mainContent').classList.toggle('ms-0');
         };
 
-        document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(el => {
+        // ✅ PERBAIKAN NAVIGASI SIDEBAR (Pastikan event listener bekerja)
+        document.querySelectorAll('.sidebar .nav-link').forEach(el => {
             el.onclick = (e) => { 
                 e.preventDefault(); 
                 const page = el.dataset.page;
-                this.loadPage(page);
-                if (window.innerWidth < 768) {
-                    toggleMobileSidebar(true);
+                if (page) {
+                    this.loadPage(page);
+                    if (window.innerWidth < 768) {
+                        toggleMobileSidebar(true);
+                    }
                 }
             };
         });
@@ -177,12 +174,10 @@ class App {
         });
     }
 
-    // 🔥 PERBAIKAN PENTING: TOMBOL FAB
     setupFAB() { 
         const fab = document.getElementById('fabBtn');
         if(fab) {
             fab.onclick = () => {
-                // Jika user sedang di halaman Vault, tombol + akan membuka form tambah akun
                 if (this.currentPage === 'vault' && window.vaultModule && typeof window.vaultModule.showAddForm === 'function') {
                     window.vaultModule.showAddForm();
                 } else {
