@@ -11,8 +11,17 @@ class App {
             if (user) {
                 this.user = user;
                 document.getElementById('userAvatar').innerText = user.email.charAt(0).toUpperCase();
+                
+                // 💥 MUNCULKAN HEADER DAN FAB SAAT LOGIN BERHASIL
+                document.getElementById('appHeader').classList.remove('d-none');
+                document.getElementById('fabBtn').classList.remove('d-none');
+
                 this.loadDashboard();
             } else {
+                // 💥 PASTIKAN HEADER DAN FAB HILANG SAAT LOGOUT
+                document.getElementById('appHeader').classList.add('d-none');
+                document.getElementById('fabBtn').classList.add('d-none');
+
                 renderAuthPage();
                 document.getElementById('loadingScreen').classList.add('hidden');
             }
@@ -21,12 +30,6 @@ class App {
 
     loadDashboard() {
         try {
-            // 💥 KEMBALIKAN HEADER DAN FAB SETELAH LOGIN BERHASIL
-            const header = document.getElementById('appHeader');
-            const fab = document.getElementById('fabBtn');
-            if(header) header.style.display = 'flex'; // Navbar default display flex
-            if(fab) fab.style.display = 'flex';      // FAB default display flex
-
             this.setupSidebar();
             this.setupThemeToggle();
             this.setupCustomizer();
